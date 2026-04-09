@@ -1,0 +1,46 @@
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = "master.cshtml";
+}
+
+<h2>Direct</h2>
+@await Html.RenderTableAsync("tableEditorDirect")
+
+<h2>Block List</h2>
+@{
+	var blockList = Model.Value<BlockListModel>("tableEditorBlockList");
+
+	if (blockList is not null)
+	{
+		foreach (var block in blockList)
+		{
+			// Replace "table" with the alias of the table editor property on your block element type
+			var table = block.Content.Value<WebwondersTableEditor>("tableEditorBlock");
+
+			if (table is not null)
+			{
+				@await Html.PartialAsync("~/Views/Partials/Tables/default.cshtml", table)
+			}
+		}
+	}
+}
+
+<h2>Block Grid</h2>
+@{
+	var blockGrid = Model.Value<BlockGridModel>("tableEditorBlockGrid");
+
+	if (blockGrid is not null)
+	{
+		foreach (var item in blockGrid)
+		{
+			// Replace "table" with the alias of the table editor property on your block element type
+			var table = item.Content.Value<WebwondersTableEditor>("tableEditorBlock");
+
+			if (table is not null)
+			{
+				@await Html.PartialAsync("~/Views/Partials/Tables/default.cshtml", table)
+			}
+		}
+	}
+}

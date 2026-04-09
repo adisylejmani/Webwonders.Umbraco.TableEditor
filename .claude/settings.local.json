@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet new list:*)",
+      "Bash(rm -rf \"/c/WebWork/Webwonders_Packages/Webwonders.Umbraco.TableEditor/testsite\")",
+      "Bash(dotnet new:*)"
+    ]
+  }
+}

@@ -72,3 +72,11 @@ _ReSharper*/
 # Ignoring Dev site outputs.
 /dev/umbraco/
 /dev/App_Data/
+
+# Test site - Umbraco runtime data (never commit these)
+/testsite/umbraco/Data/
+/testsite/umbraco/Logs/
+/testsite/umbraco/mediacache/
+/testsite/App_Data/
+# Ignore environment-specific overrides but keep the base configs
+/testsite/appsettings.Production.json

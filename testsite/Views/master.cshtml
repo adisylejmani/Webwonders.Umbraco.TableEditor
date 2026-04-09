@@ -1,0 +1,21 @@
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>TableEditor Test Site</title>
+</head>
+<body>
+	<header style="padding: 1rem 2rem; background: #1a1a2e; color: white;">
+		<h1 style="margin: 0; font-size: 1.25rem;">TableEditor Test Site</h1>
+	</header>
+	<main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+		@RenderBody()
+	</main>
+</body>
+</html>
