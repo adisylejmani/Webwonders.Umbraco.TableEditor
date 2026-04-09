@@ -1,7 +1,7 @@
 import { LitElement as f, html as s, css as b, property as m, state as g, customElement as _ } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin as y } from "@umbraco-cms/backoffice/element-api";
-import { UmbChangeEvent as h } from "@umbraco-cms/backoffice/event";
-import { UmbModalToken as v, umbOpenModal as p } from "@umbraco-cms/backoffice/modal";
+import { UmbChangeEvent as p } from "@umbraco-cms/backoffice/event";
+import { UmbModalToken as v, umbOpenModal as h } from "@umbraco-cms/backoffice/modal";
 const $ = new v(
   "Webwonders.TableEditor.TableSettingsModal",
   {
@@ -35,7 +35,7 @@ function l(e) {
 }
 let u = class extends y(f) {
   constructor() {
-    super(...arguments), this._isEdit = !1, this._hoverColIndex = null, this._dragRowIndex = null, this._dragOverRowIndex = null, this._dragColIndex = null, this._dragOverColIndex = null;
+    super(...arguments), this._isEdit = !1, this._dragRowIndex = null, this._dragOverRowIndex = null, this._dragColIndex = null, this._dragOverColIndex = null;
   }
   connectedCallback() {
     super.connectedCallback();
@@ -43,7 +43,7 @@ let u = class extends y(f) {
     e.settings || (e.settings = { columnHasHeader: !1, rowHasHeader: !1, highlightEmptyCells: !1 }), e.settings.highlightEmptyCells === void 0 && (e.settings.highlightEmptyCells = !1), this.value = e, this._original = l(e);
   }
   _commit(e) {
-    this.value = e, this.dispatchEvent(new h());
+    this.value = e, this.dispatchEvent(new p());
   }
   _toggleEdit() {
     this.readonly || (this._isEdit = !this._isEdit, this._isEdit && (this._original = l(this.value ?? n())));
@@ -53,7 +53,7 @@ let u = class extends y(f) {
   }
   async _openTableSettings() {
     if (this.readonly) return;
-    const e = this.value ?? n(), t = await p(this, $, {
+    const e = this.value ?? n(), t = await h(this, $, {
       data: {
         headline: "Table settings",
         settings: {
@@ -81,7 +81,7 @@ let u = class extends y(f) {
   }
   async _openCreateTableModal() {
     if (this.readonly) return;
-    const e = await p(this, C, {
+    const e = await h(this, C, {
       data: {
         headline: "Create table",
         rows: 3,
@@ -105,7 +105,7 @@ let u = class extends y(f) {
       columns: i,
       rows: a
     };
-    this.value = o, this._isEdit = !0, this.dispatchEvent(new h());
+    this.value = o, this._isEdit = !0, this.dispatchEvent(new p());
   }
   _insertRow(e) {
     if (this.readonly) return;
@@ -275,6 +275,7 @@ let u = class extends y(f) {
   }
   _renderReadTable(e) {
     return s`
+            <uui-scroll-container>
             <uui-table class="uuiReadTable">
                 <uui-table-row>
                     ${e.columns.map(
@@ -306,13 +307,14 @@ let u = class extends y(f) {
                     `
     )}
             </uui-table>
+            </uui-scroll-container>
         `;
   }
   _renderEditTable(e) {
     const t = e.columns.length, i = `repeat(${Math.max(t, 1)}, minmax(140px, 1fr))`;
     return s`
+            <uui-scroll-container>
             <div class="gridEditor" style=${`--te-cols:${i};`}
-            data-hover-col="${this._hoverColIndex ?? ""}"
             data-drag-col="${this._dragOverColIndex ?? ""}">
                 ${this._renderColumnHoverCss(e.columns.length)}
                 <!-- Header -->
@@ -323,9 +325,7 @@ let u = class extends y(f) {
                                  style=${`grid-column:${o + 1};`} 
                                  data-col="${o}"
                                  @dragover=${(r) => this._onColDragOver(r, o)}
-                                 @drop=${(r) => this._onColDrop(r, o)}
-                                 @mouseenter=${() => this._hoverColIndex = o}
-                                 @mouseleave=${() => this._hoverColIndex = null}>
+                                 @drop=${(r) => this._onColDrop(r, o)}>
                                 <div class="colRailCell">
                                     <uui-action-bar class="colRailActions">
                                         <uui-button
@@ -494,18 +494,13 @@ let u = class extends y(f) {
                         `
     )}
             </div>
+            </uui-scroll-container>
         `;
   }
   _renderColumnHoverCss(e) {
     const t = [];
     for (let i = 0; i < e; i++)
       t.push(`
-      .gridEditor[data-hover-col="${i}"] .cell[data-col="${i}"],
-      .gridEditor[data-hover-col="${i}"] .headerCol[data-col="${i}"] {
-        background-color: var(--uui-color-surface-alt);
-        border-radius: var(--uui-border-radius);
-      }
-
       .gridEditor[data-drag-col="${i}"] .cell[data-col="${i}"],
       .gridEditor[data-drag-col="${i}"] .headerCol[data-col="${i}"] {
         border-left: 2px solid var(--uui-color-border-emphasis, var(--uui-color-border));
@@ -522,6 +517,7 @@ u.styles = b`
         .actions {
             display: flex;
             gap: 10px;
+            margin-top: 10px;
             margin-bottom: 10px;
         }
 
@@ -536,14 +532,19 @@ u.styles = b`
         uui-input {
             width: 100%;
         }
+
+        .uuiReadTable uui-table-head-cell,
+        .uuiReadTable uui-table-cell {
+            min-width: 140px;
+        }
         
         .gridEditor {
             display: flex;
             flex-direction: column;
             gap: 0;
             padding-bottom: var(--uui-size-6);
-            overflow: hidden;
             background: var(--uui-color-surface);
+            min-width: max-content;
         }
 
         .gridHeader {
@@ -576,19 +577,12 @@ u.styles = b`
             transition: background-color 120ms ease-in-out;
         }
 
-        .rowLayout:hover,
-        .rowLayout:focus-within {
-            background-color: var(--uui-color-surface-alt);
-            border-radius: var(--uui-border-radius);
-        }
-
         .gridRow {
             display: grid;
             grid-template-columns: var(--te-cols);
             gap: var(--uui-size-6);
             padding: 0;
             border-bottom: none;
-            min-width: 0;
         }
 
         .rowActionsRail {
@@ -675,7 +669,6 @@ u.styles = b`
             display: grid;
             grid-template-columns: var(--te-cols);
             gap: var(--uui-size-6);
-            min-width: 0;
         }
         
         .headerCol {
@@ -773,9 +766,6 @@ c([
 ], u.prototype, "_original", 2);
 c([
   g()
-], u.prototype, "_hoverColIndex", 2);
-c([
-  g()
 ], u.prototype, "_dragRowIndex", 2);
 c([
   g()
@@ -793,4 +783,4 @@ export {
   u as WebwondersTableEditorPropertyEditorUiElement,
   u as element
 };
-//# sourceMappingURL=table-editor.element-DSbXfnU6.js.map
+//# sourceMappingURL=table-editor.element-DaB1U8u9.js.map

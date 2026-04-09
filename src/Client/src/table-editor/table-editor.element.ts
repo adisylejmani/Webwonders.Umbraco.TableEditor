@@ -45,9 +45,6 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
     @state()
     private _original?: TableModel;
 
-    @state()
-    private _hoverColIndex: number | null = null;
-
     @state() private _dragRowIndex: number | null = null;
     @state() private _dragOverRowIndex: number | null = null;
 
@@ -440,6 +437,7 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
 
     private _renderReadTable(table: TableModel) {
         return html`
+            <uui-scroll-container>
             <uui-table class="uuiReadTable">
                 <uui-table-row>
                     ${table.columns.map(
@@ -475,6 +473,7 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                     `
                 )}
             </uui-table>
+            </uui-scroll-container>
         `;
     }
 
@@ -483,8 +482,8 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         const templateCols = `repeat(${Math.max(colCount, 1)}, minmax(140px, 1fr))`;
 
         return html`
+            <uui-scroll-container>
             <div class="gridEditor" style=${`--te-cols:${templateCols};`}
-            data-hover-col="${this._hoverColIndex ?? ''}"
             data-drag-col="${this._dragOverColIndex ?? ''}">
                 ${this._renderColumnHoverCss(table.columns.length)}
                 <!-- Header -->
@@ -495,9 +494,7 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                                  style=${`grid-column:${ci + 1};`} 
                                  data-col="${ci}"
                                  @dragover=${(e: DragEvent) => this._onColDragOver(e, ci)}
-                                 @drop=${(e: DragEvent) => this._onColDrop(e, ci)}
-                                 @mouseenter=${() => (this._hoverColIndex = ci)}
-                                 @mouseleave=${() => (this._hoverColIndex = null)}>
+                                 @drop=${(e: DragEvent) => this._onColDrop(e, ci)}>
                                 <div class="colRailCell">
                                     <uui-action-bar class="colRailActions">
                                         <uui-button
@@ -663,6 +660,7 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                         `
                 )}
             </div>
+            </uui-scroll-container>
         `;
     }
 
@@ -671,12 +669,6 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
 
         for (let i = 0; i < colCount; i++) {
             rules.push(`
-      .gridEditor[data-hover-col="${i}"] .cell[data-col="${i}"],
-      .gridEditor[data-hover-col="${i}"] .headerCol[data-col="${i}"] {
-        background-color: var(--uui-color-surface-alt);
-        border-radius: var(--uui-border-radius);
-      }
-
       .gridEditor[data-drag-col="${i}"] .cell[data-col="${i}"],
       .gridEditor[data-drag-col="${i}"] .headerCol[data-col="${i}"] {
         border-left: 2px solid var(--uui-color-border-emphasis, var(--uui-color-border));
@@ -694,6 +686,7 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         .actions {
             display: flex;
             gap: 10px;
+            margin-top: 10px;
             margin-bottom: 10px;
         }
 
@@ -708,14 +701,19 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         uui-input {
             width: 100%;
         }
+
+        .uuiReadTable uui-table-head-cell,
+        .uuiReadTable uui-table-cell {
+            min-width: 140px;
+        }
         
         .gridEditor {
             display: flex;
             flex-direction: column;
             gap: 0;
             padding-bottom: var(--uui-size-6);
-            overflow: hidden;
             background: var(--uui-color-surface);
+            min-width: max-content;
         }
 
         .gridHeader {
@@ -748,19 +746,12 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
             transition: background-color 120ms ease-in-out;
         }
 
-        .rowLayout:hover,
-        .rowLayout:focus-within {
-            background-color: var(--uui-color-surface-alt);
-            border-radius: var(--uui-border-radius);
-        }
-
         .gridRow {
             display: grid;
             grid-template-columns: var(--te-cols);
             gap: var(--uui-size-6);
             padding: 0;
             border-bottom: none;
-            min-width: 0;
         }
 
         .rowActionsRail {
@@ -847,7 +838,6 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
             display: grid;
             grid-template-columns: var(--te-cols);
             gap: var(--uui-size-6);
-            min-width: 0;
         }
         
         .headerCol {
