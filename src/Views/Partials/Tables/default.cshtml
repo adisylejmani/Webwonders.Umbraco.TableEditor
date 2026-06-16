@@ -20,10 +20,15 @@
     {
         <thead>
             <tr>
-                @foreach (var column in Model.Columns)
+                @for (var i = 0; i < Model.Columns.Count; i++)
                 {
-                    <th scope="col" class="ww-table__col-header">
-                        @column.Value
+                    var colClasses = string.Join(" ", new[]
+                    {
+                        "ww-table__col-header",
+                        rowHasHeader && i == 0 ? "ww-table__row-header" : null
+                    }.Where(c => c != null));
+                    <th scope="col" class="@colClasses">
+                        @Model.Columns[i].Value
                     </th>
                 }
             </tr>

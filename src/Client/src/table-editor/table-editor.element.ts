@@ -441,8 +441,11 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
             <uui-table class="uuiReadTable">
                 <uui-table-row>
                     ${table.columns.map(
-                            (c) => html`
-                            <uui-table-head-cell class=${table.settings.columnHasHeader ? "colHeader" : ""}>
+                            (c, ci) => html`
+                            <uui-table-head-cell class=${[
+                                table.settings.columnHasHeader ? "colHeader" : "",
+                                table.settings.rowHasHeader && ci === 0 ? "rowHeader" : "",
+                            ].filter(Boolean).join(" ")}>
                                 ${c.value}
                             </uui-table-head-cell>
                         `
@@ -490,7 +493,7 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                 <div class="headerLayout">
                     <div class="headerColumns">
                         ${table.columns.map((c, ci) => html`
-                            <div class=${["headerCol", this._dragOverColIndex === ci ? "dropTarget" : ""].filter(Boolean).join(" ")} 
+                            <div class=${["headerCol", this._dragOverColIndex === ci ? "dropTarget" : "", table.settings.rowHasHeader && ci === 0 ? "rowHeader" : ""].filter(Boolean).join(" ")}
                                  style=${`grid-column:${ci + 1};`} 
                                  data-col="${ci}"
                                  @dragover=${(e: DragEvent) => this._onColDragOver(e, ci)}
