@@ -538,17 +538,15 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                                                 @click=${(ev: Event) => { ev.stopPropagation(); this._insertCol(ci + 1); }}>
                                             <uui-icon name="icon-arrow-right"></uui-icon>
                                         </uui-button>
-                                        <uui-button
+                                        <span
                                                 class="dragHandle"
-                                                label="Drag to reorder column"
-                                                look="secondary"
-                                                compact
-                                                ?disabled=${this.readonly}
-                                                draggable="true"
+                                                role="button"
+                                                aria-label="Drag to reorder column"
+                                                draggable=${this.readonly ? "false" : "true"}
                                                 @dragstart=${(e: DragEvent) => this._onColDragStart(e, ci)}
                                                 @dragend=${this._onColDragEnd}>
                                             <uui-icon name="icon-navigation"></uui-icon>
-                                        </uui-button>
+                                        </span>
                                     </uui-action-bar>
                                 </div>
 
@@ -653,17 +651,15 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                                                 </div>
                                             </uui-box>
                                         </uui-popover-container>
-                                        <uui-button
+                                        <span
                                                 class="dragHandle"
-                                                label="Drag to reorder row"
-                                                look="secondary"
-                                                compact
-                                                ?disabled=${this.readonly}
-                                                draggable="true"
+                                                role="button"
+                                                aria-label="Drag to reorder row"
+                                                draggable=${this.readonly ? "false" : "true"}
                                                 @dragstart=${(e: DragEvent) => this._onRowDragStart(e, ri)}
                                                 @dragend=${this._onRowDragEnd}>
                                             <uui-icon name="icon-navigation"></uui-icon>
-                                        </uui-button>
+                                        </span>
                                     </uui-action-bar>
                                 </div>
                             </div>
@@ -909,7 +905,23 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         }
 
         .dragHandle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: var(--uui-border-radius);
+            color: var(--uui-color-border-emphasis);
             cursor: grab;
+            flex-shrink: 0;
+            transition: background-color 120ms ease-in-out, color 120ms ease-in-out;
+            user-select: none;
+            -webkit-user-drag: element;
+        }
+
+        .dragHandle:hover {
+            background: var(--uui-color-surface-alt);
+            color: var(--uui-color-text);
         }
 
         .dragHandle:active {
