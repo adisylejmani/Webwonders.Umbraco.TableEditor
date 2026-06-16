@@ -48,6 +48,13 @@ public class WebwondersTableRenderer : IWebwondersTableRenderer
         return await RenderTableAsync(html, table, theme);
     }
 
+    public async Task<IHtmlContent> RenderTableAsync(IHtmlHelper html, IPublishedElement element, string propertyAlias, string theme = "default")
+    {
+        var table = element.Value<WebwondersTableEditor>(propertyAlias);
+        if (table is null) return HtmlString.Empty;
+        return await RenderTableAsync(html, table, theme);
+    }
+
     public async Task<IHtmlContent> RenderTableAsync(IHtmlHelper html, WebwondersTableEditor table, string theme = "default")
     {
         var viewPath = $"~/Views/Partials/Tables/{theme}.cshtml";

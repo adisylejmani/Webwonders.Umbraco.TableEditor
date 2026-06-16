@@ -21,6 +21,12 @@ public static class WebwondersTableHtmlExtensions
         return renderer.RenderTableAsync(html, content, propertyAlias, theme);
     }
 
+    public static Task<IHtmlContent> RenderTableAsync(this IHtmlHelper html, IPublishedElement element, string propertyAlias, string theme = "Default")
+    {
+        var renderer = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IWebwondersTableRenderer>();
+        return renderer.RenderTableAsync(html, element, propertyAlias, theme);
+    }
+
     public static Task<IHtmlContent> RenderTableAsync(this IHtmlHelper html, WebwondersTableEditor table, string theme = "Default")
     {
         var renderer = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IWebwondersTableRenderer>();
