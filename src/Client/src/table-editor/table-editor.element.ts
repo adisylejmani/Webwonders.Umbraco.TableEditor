@@ -452,14 +452,17 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
             <uui-table class="uuiReadTable">
                 <uui-table-row>
                     ${table.columns.map(
-                            (c, ci) => html`
-                            <uui-table-head-cell class=${[
-                                table.settings.columnHasHeader ? "colHeader" : "",
-                                table.settings.rowHasHeader && ci === 0 ? "rowHeader" : "",
-                            ].filter(Boolean).join(" ")}>
-                                ${c.value}
-                            </uui-table-head-cell>
-                        `
+                            (c, ci) => {
+                                const isEmpty = !c.value?.trim();
+                                return html`
+                                <uui-table-head-cell class=${[
+                                    table.settings.columnHasHeader ? "colHeader" : "",
+                                    table.settings.rowHasHeader && ci === 0 ? "rowHeader" : "",
+                                    table.settings.highlightEmptyCells && isEmpty ? "empty" : "",
+                                ].filter(Boolean).join(" ")}>
+                                    ${c.value}
+                                </uui-table-head-cell>
+                            `}
                     )}
                 </uui-table-row>
 
@@ -790,6 +793,11 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
             min-width: 0;
         }
 
+        .colHeader {
+            font-weight: 700;
+            background: var(--uui-color-surface-alt);
+        }
+
         .rowHeader {
             font-weight: 700;
             background: var(--uui-color-surface-alt);
@@ -806,8 +814,14 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         }
 
         .empty uui-input {
-            outline: 1px dashed var(--uui-color-border);
+            --uui-input-background-color: color-mix(in srgb, var(--uui-color-warning) 12%, transparent);
+            outline: 1px dashed var(--uui-color-warning-emphasis, var(--uui-color-border-emphasis));
             outline-offset: 2px;
+        }
+
+        uui-table-cell.empty,
+        uui-table-head-cell.empty {
+            background: color-mix(in srgb, var(--uui-color-warning) 12%, transparent);
         }
         
         .insertLine {
