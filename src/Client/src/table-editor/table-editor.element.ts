@@ -8,7 +8,7 @@
 } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { UmbChangeEvent } from "@umbraco-cms/backoffice/event";
-import { umbOpenModal } from "@umbraco-cms/backoffice/modal";
+import { umbConfirmModal, umbOpenModal } from "@umbraco-cms/backoffice/modal";
 import { TABLE_SETTINGS_MODAL_TOKEN } from "./table-settings-modal.token";
 import { TABLE_CREATE_MODAL_TOKEN } from "./table-create-modal.token";
 
@@ -192,11 +192,22 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         this._commit(t);
     }
 
-    private _removeCol(index: number) {
+    private async _removeCol(index: number) {
         if (this.readonly) return;
         const t = deepCopy(this.value ?? createEmptyTable());
         if (t.columns.length <= 1) return;
         if (index < 0 || index >= t.columns.length) return;
+
+        try {
+            await umbConfirmModal(this, {
+                headline: "Delete column",
+                content: "Are you sure you want to delete this column? This cannot be undone.",
+                color: "danger",
+                confirmLabel: "Delete",
+            });
+        } catch {
+            return;
+        }
 
         t.columns.splice(index, 1);
         for (const row of t.rows) row.cells.splice(index, 1);
