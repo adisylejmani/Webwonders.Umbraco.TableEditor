@@ -3,7 +3,7 @@ const e = [
     type: "propertyEditorUi",
     alias: "Webwonders.TableEditor.PropertyEditorUi",
     name: "Webwonders Table Editor Property Editor UI",
-    element: () => import("./table-editor.element-DaB1U8u9.js"),
+    element: () => import("./table-editor.element-CsLRjt1C.js"),
     meta: {
       label: "Webwonders Table Editor",
       icon: "icon-table",
@@ -29,7 +29,7 @@ const e = [
     type: "modal",
     alias: "Webwonders.TableEditor.CreateTableModal",
     name: "Webwonders Table Create Modal",
-    element: () => import("./table-create-modal.element-CrZU_DSn.js")
+    element: () => import("./table-create-modal.element-DXVjzT08.js")
   }
 ];
 export {

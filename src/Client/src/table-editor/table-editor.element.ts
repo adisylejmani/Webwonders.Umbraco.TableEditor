@@ -134,14 +134,14 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
 
         if (!result) return;
 
-        this._createTable(result.rows, result.columns);
+        this._createTable(result.rows, result.columns, result.columnNames, result.cellData);
     }
 
-    private _createTable(rowCount: number, colCount: number) {
-        const cols = Array.from({ length: colCount }, () => ({ value: "" }));
-        const rows = Array.from({ length: rowCount }, () => ({
+    private _createTable(rowCount: number, colCount: number, columnNames?: string[], cellData?: string[][]) {
+        const cols = Array.from({ length: colCount }, (_, i) => ({ value: columnNames?.[i] ?? "" }));
+        const rows = Array.from({ length: rowCount }, (_, ri) => ({
             settings: {},
-            cells: Array.from({ length: colCount }, () => ({ value: "" })),
+            cells: Array.from({ length: colCount }, (_, ci) => ({ value: cellData?.[ri]?.[ci] ?? "" })),
         }));
 
         const next = {
