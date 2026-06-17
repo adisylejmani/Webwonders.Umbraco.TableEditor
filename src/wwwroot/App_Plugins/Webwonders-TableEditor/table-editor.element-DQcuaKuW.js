@@ -1,4 +1,4 @@
-import { LitElement as _, html as n, css as y, property as w, state as g, customElement as x } from "@umbraco-cms/backoffice/external/lit";
+import { LitElement as _, html as s, css as y, property as w, state as g, customElement as x } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin as $ } from "@umbraco-cms/backoffice/element-api";
 import { UmbChangeEvent as m } from "@umbraco-cms/backoffice/event";
 import { UmbModalToken as f, umbOpenModal as v, umbConfirmModal as C } from "@umbraco-cms/backoffice/modal";
@@ -14,7 +14,8 @@ const E = new f(
   "Webwonders.TableEditor.CreateTableModal",
   {
     modal: {
-      type: "dialog"
+      type: "sidebar",
+      size: "small"
     }
   }
 );
@@ -23,7 +24,7 @@ var H = Object.defineProperty, T = Object.getOwnPropertyDescriptor, c = (e, t, i
     (u = e[r]) && (o = (a ? u(t, i, o) : u(o)) || o);
   return a && o && H(t, i, o), o;
 };
-function s() {
+function n() {
   return {
     settings: { columnHasHeader: !1, rowHasHeader: !1, highlightEmptyCells: !1 },
     columns: [],
@@ -39,21 +40,21 @@ let d = class extends $(_) {
   }
   connectedCallback() {
     super.connectedCallback();
-    const e = this.value ?? s();
+    const e = this.value ?? n();
     e.settings || (e.settings = { columnHasHeader: !1, rowHasHeader: !1, highlightEmptyCells: !1 }), e.settings.highlightEmptyCells === void 0 && (e.settings.highlightEmptyCells = !1), this.value = e, this._original = l(e);
   }
   _commit(e) {
     this.value = e, this.dispatchEvent(new m());
   }
   _toggleEdit() {
-    this.readonly || (this._isEdit = !this._isEdit, this._isEdit && (this._original = l(this.value ?? s())));
+    this.readonly || (this._isEdit = !this._isEdit, this._isEdit && (this._original = l(this.value ?? n())));
   }
   _cancel() {
     this.readonly || (this._isEdit = !1, this._original && this._commit(l(this._original)));
   }
   async _openTableSettings() {
     if (this.readonly) return;
-    const e = this.value ?? s(), t = await v(this, E, {
+    const e = this.value ?? n(), t = await v(this, E, {
       data: {
         headline: "Table settings",
         settings: {
@@ -73,7 +74,7 @@ let d = class extends $(_) {
   }
   _updateRowSettings(e, t) {
     if (this.readonly) return;
-    const i = l(this.value ?? s()), a = i.rows[e];
+    const i = l(this.value ?? n()), a = i.rows[e];
     a && (a.settings = {
       ...a.settings ?? {},
       ...t
@@ -109,7 +110,7 @@ let d = class extends $(_) {
   }
   _insertRow(e) {
     if (this.readonly) return;
-    const t = l(this.value ?? s()), i = {
+    const t = l(this.value ?? n()), i = {
       settings: { isHeaderRow: !1, isUnderlined: !1 },
       cells: t.columns.map(() => ({ value: "" }))
     }, a = Math.max(0, Math.min(e, t.rows.length));
@@ -117,7 +118,7 @@ let d = class extends $(_) {
   }
   _insertCol(e) {
     if (this.readonly) return;
-    const t = l(this.value ?? s()), i = Math.max(0, Math.min(e, t.columns.length));
+    const t = l(this.value ?? n()), i = Math.max(0, Math.min(e, t.columns.length));
     t.columns.splice(i, 0, { value: "" });
     for (const a of t.rows)
       a.cells.splice(i, 0, { value: "" });
@@ -125,7 +126,7 @@ let d = class extends $(_) {
   }
   async _removeCol(e) {
     if (this.readonly) return;
-    const t = l(this.value ?? s());
+    const t = l(this.value ?? n());
     if (!(t.columns.length <= 1) && !(e < 0 || e >= t.columns.length)) {
       try {
         await C(this, {
@@ -144,15 +145,15 @@ let d = class extends $(_) {
   }
   _removeRow(e) {
     if (this.readonly) return;
-    const t = l(this.value ?? s());
+    const t = l(this.value ?? n());
     t.rows.length <= 1 || e < 0 || e >= t.rows.length || (t.rows.splice(e, 1), this._commit(t));
   }
   _updateColName(e, t) {
-    const i = l(this.value ?? s());
+    const i = l(this.value ?? n());
     i.columns[e] && (i.columns[e].value = t, this._commit(i));
   }
   _updateCell(e, t, i) {
-    const a = l(this.value ?? s()), o = a.rows[e];
+    const a = l(this.value ?? n()), o = a.rows[e];
     o?.cells[t] && (o.cells[t].value = i, this._commit(a));
   }
   _isTableEmpty(e) {
@@ -160,14 +161,14 @@ let d = class extends $(_) {
   }
   _moveRow(e, t) {
     if (e === t) return;
-    const i = l(this.value ?? s());
+    const i = l(this.value ?? n());
     if (e < 0 || e >= i.rows.length) return;
     const a = Math.max(0, Math.min(t, i.rows.length - 1)), [o] = i.rows.splice(e, 1);
     i.rows.splice(a, 0, o), this._commit(i);
   }
   _moveCol(e, t) {
     if (e === t) return;
-    const i = l(this.value ?? s());
+    const i = l(this.value ?? n());
     if (e < 0 || e >= i.columns.length) return;
     const a = Math.max(0, Math.min(t, i.columns.length - 1)), [o] = i.columns.splice(e, 1);
     i.columns.splice(a, 0, o);
@@ -225,21 +226,21 @@ let d = class extends $(_) {
     return this._dragColIndex !== null && e.dataTransfer?.types?.includes("application/x-webwonders-col");
   }
   render() {
-    const e = this.value ?? s();
-    return n`
-            ${this._isEdit ? n`
+    const e = this.value ?? n();
+    return s`
+            ${this._isEdit ? s`
                     ${this._renderEditControls(e)}
                     ${this._renderEditTable(e)}
-                ` : n`${this._renderReadTable(e)}`}
+                ` : s`${this._renderReadTable(e)}`}
 
             ${this._renderToolbar()}
         `;
   }
   _renderToolbar() {
     const e = this.value, t = this._isTableEmpty(e);
-    return n`
+    return s`
             <div class="toolbar">
-                ${!this._isEdit && t ? n`
+                ${!this._isEdit && t ? s`
                     <uui-button
                         look="primary"
                         label="Create table"
@@ -247,7 +248,7 @@ let d = class extends $(_) {
                         @click=${this._openCreateTableModal}>
                         Create
                     </uui-button>
-                ` : n`
+                ` : s`
                     <uui-button
                         look="primary"
                         label=${this._isEdit ? "Done" : "Edit"}
@@ -257,7 +258,7 @@ let d = class extends $(_) {
                     </uui-button>
                 `}
 
-                ${this._isEdit ? n`
+                ${this._isEdit ? s`
                         <uui-button
                                 look="secondary"
                                 @click=${this._cancel}
@@ -268,7 +269,7 @@ let d = class extends $(_) {
         `;
   }
   _renderEditControls(e) {
-    return n`
+    return s`
             <div class="editControls">
                 <div class="settings">
                     <uui-button
@@ -284,14 +285,14 @@ let d = class extends $(_) {
         `;
   }
   _renderReadTable(e) {
-    return n`
+    return s`
             <uui-scroll-container>
             <uui-table class="uuiReadTable">
                 <uui-table-row>
                     ${e.columns.map(
       (t, i) => {
         const a = !t.value?.trim();
-        return n`
+        return s`
                                 <uui-table-head-cell class=${[
           e.settings.columnHasHeader ? "colHeader" : "",
           e.settings.rowHasHeader && i === 0 ? "rowHeader" : "",
@@ -305,12 +306,12 @@ let d = class extends $(_) {
                 </uui-table-row>
 
                 ${e.rows.map(
-      (t) => n`
+      (t) => s`
                         <uui-table-row
                                 class=${[t.settings?.isHeaderRow ? "isHeaderRow" : "", t.settings?.isUnderlined ? "isUnderlined" : ""].filter(Boolean).join(" ")}>
                             ${t.cells.map((i, a) => {
         const o = !i.value?.trim();
-        return n`
+        return s`
                                     <uui-table-cell
                                             class=${[
           e.settings.rowHasHeader && a === 0 ? "rowHeader" : "",
@@ -329,7 +330,7 @@ let d = class extends $(_) {
   }
   _renderEditTable(e) {
     const t = e.columns.length, i = `repeat(${Math.max(t, 1)}, minmax(140px, 1fr))`;
-    return n`
+    return s`
             <uui-scroll-container>
             <div class="gridEditor" style=${`--te-cols:${i};`}
             data-drag-col="${this._dragOverColIndex ?? ""}">
@@ -337,7 +338,7 @@ let d = class extends $(_) {
                 <!-- Header -->
                 <div class="headerLayout">
                     <div class="headerColumns">
-                        ${e.columns.map((a, o) => n`
+                        ${e.columns.map((a, o) => s`
                             <div class=${["headerCol", this._dragOverColIndex === o ? "dropTarget" : "", e.settings.rowHasHeader && o === 0 ? "rowHeader" : ""].filter(Boolean).join(" ")}
                                  style=${`grid-column:${o + 1};`} 
                                  data-col="${o}"
@@ -408,14 +409,14 @@ let d = class extends $(_) {
                 </div>
                 
                 ${e.rows.map(
-      (a, o) => n`
+      (a, o) => s`
                             <div class=${["rowLayout", this._dragOverRowIndex === o ? "dropTarget" : ""].filter(Boolean).join(" ")}
                                  @dragover=${(r) => this._onRowDragOver(r, o)}
                                  @drop=${(r) => this._onRowDrop(r, o)} 
                                  data-row=${o}>
                                 <div class="gridRow">
                                     ${a.cells.map(
-        (r, u) => n`
+        (r, u) => s`
                                         <div
                                             class=${[
           "cell",
@@ -521,7 +522,7 @@ let d = class extends $(_) {
         border-radius: var(--uui-border-radius);
       }
     `);
-    return n`<style>${t.join(`
+    return s`<style>${t.join(`
 `)}</style>`;
   }
 };
@@ -823,4 +824,4 @@ export {
   d as WebwondersTableEditorPropertyEditorUiElement,
   d as element
 };
-//# sourceMappingURL=table-editor.element-CsLRjt1C.js.map
+//# sourceMappingURL=table-editor.element-DQcuaKuW.js.map

@@ -176,12 +176,13 @@ export class WebwondersTableCreateModalElement extends UmbModalBaseElement<
                 </div>
 
                 <div slot="actions">
-                    <uui-button look="secondary" @click=${this._close} label="Cancel"></uui-button>
+                    <uui-button look="secondary" @click=${this._close} label="Cancel">Cancel</uui-button>
                     <uui-button
                         look="primary"
                         .disabled=${!this._canSubmit}
                         @click=${this._submit}
                         label="Create">
+                        Create
                     </uui-button>
                 </div>
             </uui-dialog-layout>

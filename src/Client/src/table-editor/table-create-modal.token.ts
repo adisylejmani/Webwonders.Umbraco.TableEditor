@@ -17,7 +17,8 @@ export const TABLE_CREATE_MODAL_TOKEN = new UmbModalToken<TableCreateModalData, 
     "Webwonders.TableEditor.CreateTableModal",
     {
         modal: {
-            type: "dialog",
+            type: "sidebar",
+            size: "small",
         },
     }
 );

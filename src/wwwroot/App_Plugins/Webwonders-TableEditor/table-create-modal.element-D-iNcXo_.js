@@ -21976,12 +21976,13 @@ let Xr = class extends Ps {
                 </div>
 
                 <div slot="actions">
-                    <uui-button look="secondary" @click=${this._close} label="Cancel"></uui-button>
+                    <uui-button look="secondary" @click=${this._close} label="Cancel">Cancel</uui-button>
                     <uui-button
                         look="primary"
                         .disabled=${!this._canSubmit}
                         @click=${this._submit}
                         label="Create">
+                        Create
                     </uui-button>
                 </div>
             </uui-dialog-layout>
@@ -22161,4 +22162,4 @@ export {
   Xr as WebwondersTableCreateModalElement,
   Xr as element
 };
-//# sourceMappingURL=table-create-modal.element-DXVjzT08.js.map
+//# sourceMappingURL=table-create-modal.element-D-iNcXo_.js.map
