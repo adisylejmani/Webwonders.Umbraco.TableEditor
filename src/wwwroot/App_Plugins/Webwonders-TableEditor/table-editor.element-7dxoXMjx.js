@@ -1,8 +1,8 @@
-import { LitElement as _, html as s, css as y, property as w, state as g, customElement as x } from "@umbraco-cms/backoffice/external/lit";
-import { UmbElementMixin as $ } from "@umbraco-cms/backoffice/element-api";
-import { UmbChangeEvent as m } from "@umbraco-cms/backoffice/event";
-import { UmbModalToken as f, umbOpenModal as v, umbConfirmModal as C } from "@umbraco-cms/backoffice/modal";
-const E = new f(
+import { LitElement as x, html as n, css as C, property as f, state as p, customElement as $ } from "@umbraco-cms/backoffice/external/lit";
+import { UmbElementMixin as H } from "@umbraco-cms/backoffice/element-api";
+import { UmbChangeEvent as v } from "@umbraco-cms/backoffice/event";
+import { UmbModalToken as y, umbOpenModal as w, umbConfirmModal as b } from "@umbraco-cms/backoffice/modal";
+const R = new y(
   "Webwonders.TableEditor.TableSettingsModal",
   {
     modal: {
@@ -10,7 +10,7 @@ const E = new f(
       size: "small"
     }
   }
-), R = new f(
+), E = new y(
   "Webwonders.TableEditor.CreateTableModal",
   {
     modal: {
@@ -19,42 +19,42 @@ const E = new f(
     }
   }
 );
-var H = Object.defineProperty, T = Object.getOwnPropertyDescriptor, c = (e, t, i, a) => {
-  for (var o = a > 1 ? void 0 : a ? T(t, i) : t, r = e.length - 1, u; r >= 0; r--)
-    (u = e[r]) && (o = (a ? u(t, i, o) : u(o)) || o);
-  return a && o && H(t, i, o), o;
+var D = Object.defineProperty, T = Object.getOwnPropertyDescriptor, c = (e, t, i, a) => {
+  for (var o = a > 1 ? void 0 : a ? T(t, i) : t, r = e.length - 1, s; r >= 0; r--)
+    (s = e[r]) && (o = (a ? s(t, i, o) : s(o)) || o);
+  return a && o && D(t, i, o), o;
 };
-function n() {
+function l() {
   return {
     settings: { columnHasHeader: !1, rowHasHeader: !1, highlightEmptyCells: !1 },
     columns: [],
     rows: []
   };
 }
-function l(e) {
+function u(e) {
   return e && JSON.parse(JSON.stringify(e));
 }
-let d = class extends $(_) {
+let d = class extends H(x) {
   constructor() {
     super(...arguments), this._isEdit = !1, this._dragRowIndex = null, this._dragOverRowIndex = null, this._dragColIndex = null, this._dragOverColIndex = null;
   }
   connectedCallback() {
     super.connectedCallback();
-    const e = this.value ?? n();
-    e.settings || (e.settings = { columnHasHeader: !1, rowHasHeader: !1, highlightEmptyCells: !1 }), e.settings.highlightEmptyCells === void 0 && (e.settings.highlightEmptyCells = !1), this.value = e, this._original = l(e);
+    const e = this.value ?? l();
+    e.settings || (e.settings = { columnHasHeader: !1, rowHasHeader: !1, highlightEmptyCells: !1 }), e.settings.highlightEmptyCells === void 0 && (e.settings.highlightEmptyCells = !1), this.value = e, this._original = u(e);
   }
   _commit(e) {
-    this.value = e, this.dispatchEvent(new m());
+    this.value = e, this.dispatchEvent(new v());
   }
   _toggleEdit() {
-    this.readonly || (this._isEdit = !this._isEdit, this._isEdit && (this._original = l(this.value ?? n())));
+    this.readonly || (this._isEdit = !this._isEdit, this._isEdit && (this._original = u(this.value ?? l())));
   }
   _cancel() {
-    this.readonly || (this._isEdit = !1, this._original && this._commit(l(this._original)));
+    this.readonly || (this._isEdit = !1, this._original && this._commit(u(this._original)));
   }
   async _openTableSettings() {
     if (this.readonly) return;
-    const e = this.value ?? n(), t = await v(this, E, {
+    const e = this.value ?? l(), t = await w(this, R, {
       data: {
         headline: "Table settings",
         settings: {
@@ -66,7 +66,7 @@ let d = class extends $(_) {
     }).catch(() => {
     });
     if (!t?.settings) return;
-    const i = l(e);
+    const i = u(e);
     i.settings = {
       ...i.settings,
       ...t.settings
@@ -74,7 +74,7 @@ let d = class extends $(_) {
   }
   _updateRowSettings(e, t) {
     if (this.readonly) return;
-    const i = l(this.value ?? n()), a = i.rows[e];
+    const i = u(this.value ?? l()), a = i.rows[e];
     a && (a.settings = {
       ...a.settings ?? {},
       ...t
@@ -82,7 +82,7 @@ let d = class extends $(_) {
   }
   async _openCreateTableModal() {
     if (this.readonly) return;
-    const e = await v(this, R, {
+    const e = await w(this, E, {
       data: {
         headline: "Create table",
         rows: 3,
@@ -93,10 +93,10 @@ let d = class extends $(_) {
     e && this._createTable(e.rows, e.columns, e.columnNames, e.cellData);
   }
   _createTable(e, t, i, a) {
-    const o = Array.from({ length: t }, (p, h) => ({ value: i?.[h] ?? "" })), r = Array.from({ length: e }, (p, h) => ({
+    const o = Array.from({ length: t }, (g, h) => ({ value: i?.[h] ?? "" })), r = Array.from({ length: e }, (g, h) => ({
       settings: {},
-      cells: Array.from({ length: t }, (D, b) => ({ value: a?.[h]?.[b] ?? "" }))
-    })), u = {
+      cells: Array.from({ length: t }, (m, _) => ({ value: a?.[h]?.[_] ?? "" }))
+    })), s = {
       ...this.value ?? { settings: { columnHasHeader: !1, rowHasHeader: !1, highlightEmptyCells: !1 }, columns: [], rows: [] },
       settings: {
         columnHasHeader: !1,
@@ -106,11 +106,11 @@ let d = class extends $(_) {
       columns: o,
       rows: r
     };
-    this.value = u, this._isEdit = !0, this.dispatchEvent(new m());
+    this.value = s, this._isEdit = !0, this.dispatchEvent(new v());
   }
   _insertRow(e) {
     if (this.readonly) return;
-    const t = l(this.value ?? n()), i = {
+    const t = u(this.value ?? l()), i = {
       settings: { isHeaderRow: !1, isUnderlined: !1 },
       cells: t.columns.map(() => ({ value: "" }))
     }, a = Math.max(0, Math.min(e, t.rows.length));
@@ -118,7 +118,7 @@ let d = class extends $(_) {
   }
   _insertCol(e) {
     if (this.readonly) return;
-    const t = l(this.value ?? n()), i = Math.max(0, Math.min(e, t.columns.length));
+    const t = u(this.value ?? l()), i = Math.max(0, Math.min(e, t.columns.length));
     t.columns.splice(i, 0, { value: "" });
     for (const a of t.rows)
       a.cells.splice(i, 0, { value: "" });
@@ -126,10 +126,10 @@ let d = class extends $(_) {
   }
   async _removeCol(e) {
     if (this.readonly) return;
-    const t = l(this.value ?? n());
+    const t = u(this.value ?? l());
     if (!(t.columns.length <= 1) && !(e < 0 || e >= t.columns.length)) {
       try {
-        await C(this, {
+        await b(this, {
           headline: "Delete column",
           content: "Are you sure you want to delete this column? This cannot be undone.",
           color: "danger",
@@ -143,17 +143,29 @@ let d = class extends $(_) {
       this._commit(t);
     }
   }
-  _removeRow(e) {
+  async _removeRow(e) {
     if (this.readonly) return;
-    const t = l(this.value ?? n());
-    t.rows.length <= 1 || e < 0 || e >= t.rows.length || (t.rows.splice(e, 1), this._commit(t));
+    const t = u(this.value ?? l());
+    if (!(t.rows.length <= 1) && !(e < 0 || e >= t.rows.length)) {
+      try {
+        await b(this, {
+          headline: "Delete row",
+          content: "Are you sure you want to delete this row? This cannot be undone.",
+          color: "danger",
+          confirmLabel: "Delete"
+        });
+      } catch {
+        return;
+      }
+      t.rows.splice(e, 1), this._commit(t);
+    }
   }
   _updateColName(e, t) {
-    const i = l(this.value ?? n());
+    const i = u(this.value ?? l());
     i.columns[e] && (i.columns[e].value = t, this._commit(i));
   }
   _updateCell(e, t, i) {
-    const a = l(this.value ?? n()), o = a.rows[e];
+    const a = u(this.value ?? l()), o = a.rows[e];
     o?.cells[t] && (o.cells[t].value = i, this._commit(a));
   }
   _isTableEmpty(e) {
@@ -161,25 +173,27 @@ let d = class extends $(_) {
   }
   _moveRow(e, t) {
     if (e === t) return;
-    const i = l(this.value ?? n());
+    const i = u(this.value ?? l());
     if (e < 0 || e >= i.rows.length) return;
     const a = Math.max(0, Math.min(t, i.rows.length - 1)), [o] = i.rows.splice(e, 1);
     i.rows.splice(a, 0, o), this._commit(i);
   }
   _moveCol(e, t) {
     if (e === t) return;
-    const i = l(this.value ?? n());
+    const i = u(this.value ?? l());
     if (e < 0 || e >= i.columns.length) return;
     const a = Math.max(0, Math.min(t, i.columns.length - 1)), [o] = i.columns.splice(e, 1);
     i.columns.splice(a, 0, o);
     for (const r of i.rows) {
-      const [u] = r.cells.splice(e, 1);
-      r.cells.splice(a, 0, u);
+      const [s] = r.cells.splice(e, 1);
+      r.cells.splice(a, 0, s);
     }
     this._commit(i);
   }
   _onRowDragStart(e, t) {
-    this.readonly || (this._dragRowIndex = t, this._dragOverRowIndex = t, e.dataTransfer?.setData("text/plain", String(t)), e.dataTransfer?.setData("application/x-webwonders-row", "1"), e.dataTransfer?.setDragImage?.(e.target, 10, 10), e.dataTransfer && (e.dataTransfer.effectAllowed = "move"));
+    this.readonly || (this._dragRowIndex = t, this._dragOverRowIndex = t, this.renderRoot.querySelectorAll(".insertLine uui-button-inline-create").forEach((i) => {
+      i.style.pointerEvents = "none";
+    }), e.dataTransfer?.setData("text/plain", String(t)), e.dataTransfer?.setData("application/x-webwonders-row", "1"), e.dataTransfer?.setDragImage?.(e.target, 10, 10), e.dataTransfer && (e.dataTransfer.effectAllowed = "move"));
   }
   _onRowDragOver(e, t) {
     this._isDraggingRow(e) && (e.preventDefault(), this._dragOverRowIndex = t, e.dataTransfer && (e.dataTransfer.dropEffect = "move"));
@@ -191,7 +205,9 @@ let d = class extends $(_) {
     this._clearRowDrag(), i !== null && this._moveRow(i, t);
   }
   _onRowDragEnd() {
-    this._clearRowDrag();
+    this._clearRowDrag(), this.renderRoot.querySelectorAll(".insertLine uui-button-inline-create").forEach((e) => {
+      e.style.pointerEvents = "";
+    });
   }
   _clearRowDrag() {
     this._dragRowIndex = null, this._dragOverRowIndex = null;
@@ -199,13 +215,11 @@ let d = class extends $(_) {
   _isDraggingRow(e) {
     return this._dragRowIndex !== null && e.dataTransfer?.types?.includes("application/x-webwonders-row");
   }
-  _closePopoverFromEvent(e) {
-    const i = e.currentTarget?.closest("uui-popover-container");
-    i && (typeof i.hidePopover == "function" ? i.hidePopover() : typeof i.close == "function" ? i.close() : "open" in i && (i.open = !1));
-  }
   // --- columns ---
   _onColDragStart(e, t) {
-    this.readonly || (this._dragColIndex = t, this._dragOverColIndex = t, e.dataTransfer?.setData("text/plain", String(t)), e.dataTransfer?.setData("application/x-webwonders-col", "1"), e.dataTransfer?.setDragImage?.(e.target, 10, 10), e.dataTransfer && (e.dataTransfer.effectAllowed = "move"));
+    this.readonly || (this._dragColIndex = t, this._dragOverColIndex = t, this.renderRoot.querySelectorAll(".colRailActions").forEach((i) => {
+      i.style.pointerEvents = "none";
+    }), e.dataTransfer?.setData("text/plain", String(t)), e.dataTransfer?.setData("application/x-webwonders-col", "1"), e.dataTransfer?.setDragImage?.(e.target, 10, 10), e.dataTransfer && (e.dataTransfer.effectAllowed = "move"));
   }
   _onColDragOver(e, t) {
     this._isDraggingCol(e) && (e.preventDefault(), this._dragOverColIndex = t, e.dataTransfer && (e.dataTransfer.dropEffect = "move"));
@@ -217,7 +231,9 @@ let d = class extends $(_) {
     this._clearColDrag(), i !== null && this._moveCol(i, t);
   }
   _onColDragEnd() {
-    this._clearColDrag();
+    this._clearColDrag(), this.renderRoot.querySelectorAll(".colRailActions").forEach((e) => {
+      e.style.pointerEvents = "";
+    });
   }
   _clearColDrag() {
     this._dragColIndex = null, this._dragOverColIndex = null;
@@ -226,121 +242,124 @@ let d = class extends $(_) {
     return this._dragColIndex !== null && e.dataTransfer?.types?.includes("application/x-webwonders-col");
   }
   render() {
-    const e = this.value ?? n();
-    return s`
-            ${this._isEdit ? s`
+    const e = this.value ?? l();
+    return n`
+            ${this._isEdit ? n`
                     ${this._renderEditControls(e)}
                     ${this._renderEditTable(e)}
-                ` : s`${this._renderReadTable(e)}`}
+                ` : n`${this._renderReadTable(e)}`}
 
             ${this._renderToolbar()}
         `;
   }
   _renderToolbar() {
     const e = this.value, t = this._isTableEmpty(e);
-    return s`
+    return this._isEdit ? null : n`
             <div class="toolbar">
-                ${!this._isEdit && t ? s`
-                    <uui-button
-                        look="primary"
-                        label="Create table"
-                        ?disabled=${this.readonly}
-                        @click=${this._openCreateTableModal}>
-                        Create
-                    </uui-button>
-                ` : s`
-                    <uui-button
-                        look="primary"
-                        label=${this._isEdit ? "Done" : "Edit"}
-                        ?disabled=${this.readonly}
-                        @click=${this._toggleEdit}>
-                        ${this._isEdit ? "Done" : "Edit"}
-                    </uui-button>
-                `}
-
-                ${this._isEdit ? s`
+                ${t ? n`
                         <uui-button
-                                look="secondary"
-                                @click=${this._cancel}
-                                .disabled=${this.readonly}
-                                label="Cancel"></uui-button>
-                    ` : null}
+                            look="primary"
+                            label="Create table"
+                            ?disabled=${this.readonly}
+                            @click=${this._openCreateTableModal}>
+                            Create
+                        </uui-button>
+                    ` : n`
+                        <uui-button
+                            look="primary"
+                            label="Edit"
+                            ?disabled=${this.readonly}
+                            @click=${this._toggleEdit}>
+                            Edit
+                        </uui-button>
+                    `}
             </div>
         `;
   }
   _renderEditControls(e) {
-    return s`
+    return n`
             <div class="editControls">
-                <div class="settings">
+                <uui-button
+                        look="secondary"
+                        compact
+                        @click=${this._openTableSettings}
+                        .disabled=${this.readonly}
+                        label="Table settings">
+                    <uui-icon name="icon-settings"></uui-icon>
+                </uui-button>
+
+                <div class="editActions">
                     <uui-button
                             look="secondary"
-                            compact
-                            @click=${this._openTableSettings}
+                            @click=${this._cancel}
                             .disabled=${this.readonly}
-                            label="Table settings">
-                        <uui-icon name="icon-settings"></uui-icon>
+                            label="Cancel">
+                        Cancel
+                    </uui-button>
+                    <uui-button
+                            look="primary"
+                            @click=${this._toggleEdit}
+                            .disabled=${this.readonly}
+                            label="Done">
+                        Done
                     </uui-button>
                 </div>
             </div>
         `;
   }
   _renderReadTable(e) {
-    return s`
-            <uui-scroll-container>
-            <uui-table class="uuiReadTable">
-                <uui-table-row>
-                    ${e.columns.map(
+    return n`
+            <uui-box class="tableBox">
+                <uui-scroll-container>
+                <uui-table class="uuiReadTable">
+                    <uui-table-row>
+                        ${e.columns.map(
       (t, i) => {
-        const a = !t.value?.trim();
-        return s`
-                                <uui-table-head-cell class=${[
+        const a = !t.value?.trim(), o = [
           e.settings.columnHasHeader ? "colHeader" : "",
           e.settings.rowHasHeader && i === 0 ? "rowHeader" : "",
           e.settings.highlightEmptyCells && a ? "empty" : ""
-        ].filter(Boolean).join(" ")}>
-                                    ${t.value}
-                                </uui-table-head-cell>
-                            `;
+        ].filter(Boolean).join(" "), r = t.value || (e.settings.highlightEmptyCells && a ? "—" : "");
+        return e.settings.columnHasHeader ? n`<uui-table-head-cell class=${o}>${r}</uui-table-head-cell>` : n`<uui-table-cell class=${o}>${r}</uui-table-cell>`;
       }
     )}
-                </uui-table-row>
+                    </uui-table-row>
 
-                ${e.rows.map(
-      (t) => s`
-                        <uui-table-row
-                                class=${[t.settings?.isHeaderRow ? "isHeaderRow" : "", t.settings?.isUnderlined ? "isUnderlined" : ""].filter(Boolean).join(" ")}>
-                            ${t.cells.map((i, a) => {
-        const o = !i.value?.trim();
-        return s`
-                                    <uui-table-cell
-                                            class=${[
+                    ${e.rows.map(
+      (t) => n`
+                            <uui-table-row>
+                                ${t.cells.map((i, a) => {
+        const o = !i.value?.trim(), r = t.settings?.isHeaderRow, s = t.settings?.isUnderlined, g = [
           e.settings.rowHasHeader && a === 0 ? "rowHeader" : "",
           e.settings.highlightEmptyCells && o ? "empty" : ""
-        ].filter(Boolean).join(" ")}>
-                                        ${i.value}
-                                    </uui-table-cell>
-                                `;
+        ].filter(Boolean).join(" "), h = i.value || (e.settings.highlightEmptyCells && o ? "—" : ""), m = s ? n`<span style="text-decoration:underline">${h}</span>` : h;
+        return r ? n`<uui-table-head-cell class=${g}>${m}</uui-table-head-cell>` : n`<uui-table-cell class=${g}>${m}</uui-table-cell>`;
       })}
-                        </uui-table-row>
-                    `
+                            </uui-table-row>
+                        `
     )}
-            </uui-table>
-            </uui-scroll-container>
+                </uui-table>
+                </uui-scroll-container>
+            </uui-box>
         `;
   }
   _renderEditTable(e) {
     const t = e.columns.length, i = `repeat(${Math.max(t, 1)}, minmax(140px, 1fr))`;
-    return s`
+    return n`
+            <uui-box class="tableBox">
             <uui-scroll-container>
-            <div class="gridEditor" style=${`--te-cols:${i};`}
+            <div class=${["gridEditor", this._dragRowIndex !== null ? "draggingRow" : ""].filter(Boolean).join(" ")} style=${`--te-cols:${i};`}
             data-drag-col="${this._dragOverColIndex ?? ""}">
                 ${this._renderColumnHoverCss(e.columns.length)}
                 <!-- Header -->
                 <div class="headerLayout">
-                    <div class="headerColumns">
-                        ${e.columns.map((a, o) => s`
-                            <div class=${["headerCol", this._dragOverColIndex === o ? "dropTarget" : "", e.settings.rowHasHeader && o === 0 ? "rowHeader" : ""].filter(Boolean).join(" ")}
-                                 style=${`grid-column:${o + 1};`} 
+                    <div class="headerColumns"
+                        @dragover=${(a) => {
+      this._isDraggingCol(a) && a.preventDefault();
+    }}>
+                        ${e.columns.map((a, o) => n`
+                            <div class=${["headerCol", e.settings.columnHasHeader ? "colHeaderActive" : "", this._dragOverColIndex === o ? "dropTarget" : "", e.settings.rowHasHeader && o === 0 ? "rowHeader" : "", e.settings.highlightEmptyCells && !a.value?.trim() ? "empty" : ""].filter(Boolean).join(" ")}
+                                 style=${`grid-column:${o + 1};`}
                                  data-col="${o}"
                                  @dragover=${(r) => this._onColDragOver(r, o)}
                                  @drop=${(r) => this._onColDrop(r, o)}>
@@ -376,16 +395,16 @@ let d = class extends $(_) {
     }}>
                                             <uui-icon name="icon-arrow-right"></uui-icon>
                                         </uui-button>
-                                        <span
-                                                class="dragHandle"
-                                                role="button"
-                                                aria-label="Drag to reorder column"
-                                                draggable=${this.readonly ? "false" : "true"}
-                                                @dragstart=${(r) => this._onColDragStart(r, o)}
-                                                @dragend=${this._onColDragEnd}>
-                                            <uui-icon name="icon-navigation"></uui-icon>
-                                        </span>
                                     </uui-action-bar>
+                                    <span
+                                            class="dragHandle colDragHandle"
+                                            role="button"
+                                            aria-label="Drag to reorder column"
+                                            draggable=${this.readonly ? "false" : "true"}
+                                            @dragstart=${(r) => this._onColDragStart(r, o)}
+                                            @dragend=${this._onColDragEnd}>
+                                        <uui-icon name="icon-navigation"></uui-icon>
+                                    </span>
                                 </div>
 
                                 <div class="colHead">
@@ -409,27 +428,27 @@ let d = class extends $(_) {
                 </div>
                 
                 ${e.rows.map(
-      (a, o) => s`
-                            <div class=${["rowLayout", this._dragOverRowIndex === o ? "dropTarget" : ""].filter(Boolean).join(" ")}
+      (a, o) => n`
+                            <div class=${["rowLayout", this._dragOverRowIndex === o ? "dropTarget" : "", a.settings?.isHeaderRow ? "isHeaderRow" : "", a.settings?.isUnderlined ? "isUnderlined" : ""].filter(Boolean).join(" ")}
                                  @dragover=${(r) => this._onRowDragOver(r, o)}
                                  @drop=${(r) => this._onRowDrop(r, o)} 
                                  data-row=${o}>
                                 <div class="gridRow">
                                     ${a.cells.map(
-        (r, u) => s`
+        (r, s) => n`
                                         <div
                                             class=${[
           "cell",
-          e.settings.rowHasHeader && u === 0 ? "rowHeader" : "",
+          e.settings.rowHasHeader && s === 0 ? "rowHeader" : "",
           e.settings.highlightEmptyCells && !r.value?.trim() ? "empty" : "",
           a.settings?.isHeaderRow ? "isHeaderRow" : "",
           a.settings?.isUnderlined ? "isUnderlined" : ""
         ].filter(Boolean).join(" ")}
-                                            style=${`grid-column:${u + 1};`}
-                                            data-col="${u}">
+                                            style=${`grid-column:${s + 1};`}
+                                            data-col="${s}">
                                             <uui-input
                                                 .value=${r.value}
-                                                @input=${(p) => this._updateCell(o, u, p.target.value)}></uui-input>
+                                                @input=${(g) => this._updateCell(o, s, g.target.value)}></uui-input>
                                         </div>
                                     `
       )}
@@ -438,9 +457,9 @@ let d = class extends $(_) {
                                 <div class="rowActionsRail">
                                     <uui-action-bar class="rowActions">
                                         <uui-button popovertarget="rowSettingsMenu${o}"
-                                        look="secondary"
-                                        label="Row settings"
-                                        compact>
+                                                look="secondary"
+                                                label="Row settings"
+                                                compact>
                                             <uui-symbol-more></uui-symbol-more>
                                         </uui-button>
                                         <uui-popover-container id="rowSettingsMenu${o}" placement="top-left" interaction="click">
@@ -453,7 +472,6 @@ let d = class extends $(_) {
                                                             @change=${(r) => this._updateRowSettings(o, { isHeaderRow: r.target.checked })}>
                                                     </uui-toggle>
                                                 </div>
-
                                                 <div class="rowMenuItem">
                                                     <span>Underlined</span>
                                                     <uui-toggle
@@ -462,30 +480,19 @@ let d = class extends $(_) {
                                                             @change=${(r) => this._updateRowSettings(o, { isUnderlined: r.target.checked })}>
                                                     </uui-toggle>
                                                 </div>
-
-                                                <div class="rowMenuDivider"></div>
-                                                <div class="rowMenuActions">
-                                                    <uui-button
-                                                            label="Delete row"
-                                                            look="primary"
-                                                            color="danger"
-                                                            ?disabled=${this.readonly || e.rows.length <= 1}
-                                                            popovertargetaction="hide"
-                                                            @click=${(r) => {
-        r.stopPropagation(), this._closePopoverFromEvent(r), this._removeRow(o);
-      }}>
-                                                        <uui-icon name="icon-trash"></uui-icon>
-                                                    </uui-button>
-                                                    <uui-button
-                                                            look="primary"
-                                                            @click=${(r) => {
-        r.stopPropagation(), this._closePopoverFromEvent(r);
-      }}>
-                                                        Done
-                                                    </uui-button>
-                                                </div>
                                             </uui-box>
                                         </uui-popover-container>
+                                        <uui-button
+                                                label="Delete row"
+                                                look="secondary"
+                                                color="danger"
+                                                compact
+                                                ?disabled=${this.readonly || e.rows.length <= 1}
+                                                @click=${(r) => {
+        r.stopPropagation(), this._removeRow(o);
+      }}>
+                                            <uui-icon name="icon-trash"></uui-icon>
+                                        </uui-button>
                                         <span
                                                 class="dragHandle"
                                                 role="button"
@@ -509,6 +516,7 @@ let d = class extends $(_) {
     )}
             </div>
             </uui-scroll-container>
+            </uui-box>
         `;
   }
   _renderColumnHoverCss(e) {
@@ -522,11 +530,11 @@ let d = class extends $(_) {
         border-radius: var(--uui-border-radius);
       }
     `);
-    return s`<style>${t.join(`
+    return n`<style>${t.join(`
 `)}</style>`;
   }
 };
-d.styles = y`
+d.styles = C`
         .toolbar,
         .actions {
             display: flex;
@@ -538,13 +546,23 @@ d.styles = y`
         .editControls {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-            margin: 10px 0;
+            justify-content: space-between;
+            gap: var(--uui-size-4);
+            margin-bottom: var(--uui-size-4);
+        }
+
+        .editActions {
+            display: flex;
+            gap: var(--uui-size-3);
         }
 
         uui-input {
             width: 100%;
+        }
+
+        .tableBox {
+            --uui-box-default-padding: 0;
+            overflow: hidden;
         }
 
         .uuiReadTable uui-table-head-cell,
@@ -629,16 +647,15 @@ d.styles = y`
         .rowHeader {
             font-weight: 700;
             background: var(--uui-color-surface-alt);
-            border-radius: 2px;
-            padding: 2px;
         }
 
-        .isHeaderRow {
+        .rowLayout.isHeaderRow .cell uui-input {
             font-weight: 700;
+            --uui-input-background-color: color-mix(in srgb, var(--uui-color-selected) 8%, transparent);
         }
 
-        .isUnderlined {
-            text-decoration: underline;
+        .rowLayout.isUnderlined .cell uui-input {
+            border-bottom: 2px solid var(--uui-color-text);
         }
 
         .empty uui-input {
@@ -647,10 +664,6 @@ d.styles = y`
             outline-offset: 2px;
         }
 
-        uui-table-cell.empty,
-        uui-table-head-cell.empty {
-            background: color-mix(in srgb, var(--uui-color-warning) 12%, transparent);
-        }
         
         .insertLine {
             position: relative;
@@ -671,6 +684,10 @@ d.styles = y`
         .insertLine:hover uui-button-inline-create,
         .insertLine:focus-within uui-button-inline-create {
             opacity: 1;
+        }
+
+        .draggingRow .insertLine uui-button-inline-create {
+            pointer-events: none;
         }
 
         .insertLine::before {
@@ -704,6 +721,10 @@ d.styles = y`
             min-width: 0;
         }
 
+        .headerCol.colHeaderActive {
+            background: var(--uui-color-surface-alt);
+        }
+
         .colRailCell {
             display: flex;
             justify-content: center;
@@ -716,9 +737,23 @@ d.styles = y`
             pointer-events: none;
             transition: opacity 120ms ease-in-out;
         }
-        
+
+        .colDragHandle {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 120ms ease-in-out;
+        }
+
         .headerCol:hover .colRailActions,
-        .headerCol:focus-within .colRailActions {
+        .headerCol:focus-within .colRailActions,
+        .headerCol.rowHeader .colRailActions {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .headerCol:hover .colDragHandle,
+        .headerCol:focus-within .colDragHandle,
+        .headerCol.rowHeader .colDragHandle {
             opacity: 1;
             pointer-events: auto;
         }
@@ -794,34 +829,34 @@ d.styles = y`
         }
     `;
 c([
-  w({ attribute: !1 })
+  f({ attribute: !1 })
 ], d.prototype, "value", 2);
 c([
-  w({ type: Boolean })
+  f({ type: Boolean })
 ], d.prototype, "readonly", 2);
 c([
-  g()
+  p()
 ], d.prototype, "_isEdit", 2);
 c([
-  g()
+  p()
 ], d.prototype, "_original", 2);
 c([
-  g()
+  p()
 ], d.prototype, "_dragRowIndex", 2);
 c([
-  g()
+  p()
 ], d.prototype, "_dragOverRowIndex", 2);
 c([
-  g()
+  p()
 ], d.prototype, "_dragColIndex", 2);
 c([
-  g()
+  p()
 ], d.prototype, "_dragOverColIndex", 2);
 d = c([
-  x("webwonders-table-editor-property-editor-ui")
+  $("webwonders-table-editor-property-editor-ui")
 ], d);
 export {
   d as WebwondersTableEditorPropertyEditorUiElement,
   d as element
 };
-//# sourceMappingURL=table-editor.element-DQcuaKuW.js.map
+//# sourceMappingURL=table-editor.element-7dxoXMjx.js.map

@@ -214,11 +214,23 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         this._commit(t);
     }
 
-    private _removeRow(index: number) {
+    private async _removeRow(index: number) {
         if (this.readonly) return;
         const t = deepCopy(this.value ?? createEmptyTable());
-        if(t.rows.length <= 1) return;
+        if (t.rows.length <= 1) return;
         if (index < 0 || index >= t.rows.length) return;
+
+        try {
+            await umbConfirmModal(this, {
+                headline: "Delete row",
+                content: "Are you sure you want to delete this row? This cannot be undone.",
+                color: "danger",
+                confirmLabel: "Delete",
+            });
+        } catch {
+            return;
+        }
+
         t.rows.splice(index, 1);
         this._commit(t);
     }
@@ -281,7 +293,9 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         if (this.readonly) return;
         this._dragRowIndex = rowIndex;
         this._dragOverRowIndex = rowIndex;
-
+        this.renderRoot.querySelectorAll<HTMLElement>(".insertLine uui-button-inline-create").forEach((el) => {
+            el.style.pointerEvents = "none";
+        });
         e.dataTransfer?.setData("text/plain", String(rowIndex));
         e.dataTransfer?.setData("application/x-webwonders-row", "1");
         e.dataTransfer?.setDragImage?.((e.target as HTMLElement), 10, 10);
@@ -309,6 +323,9 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
 
     private _onRowDragEnd() {
         this._clearRowDrag();
+        this.renderRoot.querySelectorAll<HTMLElement>(".insertLine uui-button-inline-create").forEach((el) => {
+            el.style.pointerEvents = "";
+        });
     }
 
     private _clearRowDrag() {
@@ -320,22 +337,16 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         return this._dragRowIndex !== null && e.dataTransfer?.types?.includes("application/x-webwonders-row");
     }
 
-    private _closePopoverFromEvent(e: Event) {
-        const el = e.currentTarget as HTMLElement | null;
-        const popover = el?.closest("uui-popover-container") as any;
-        if (!popover) return;
-
-        // UUI / Popover API variants:
-        if (typeof popover.hidePopover === "function") popover.hidePopover();
-        else if (typeof popover.close === "function") popover.close();
-        else if ("open" in popover) popover.open = false;
-    }
 
 // --- columns ---
     private _onColDragStart(e: DragEvent, colIndex: number) {
         if (this.readonly) return;
         this._dragColIndex = colIndex;
         this._dragOverColIndex = colIndex;
+
+        this.renderRoot.querySelectorAll<HTMLElement>(".colRailActions").forEach((el) => {
+            el.style.pointerEvents = "none";
+        });
 
         e.dataTransfer?.setData("text/plain", String(colIndex));
         e.dataTransfer?.setData("application/x-webwonders-col", "1");
@@ -363,6 +374,9 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
 
     private _onColDragEnd() {
         this._clearColDrag();
+        this.renderRoot.querySelectorAll<HTMLElement>(".colRailActions").forEach((el) => {
+            el.style.pointerEvents = "";
+        });
     }
 
     private _clearColDrag() {
@@ -393,38 +407,29 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         const table = this.value;
         const isEmpty = this._isTableEmpty(table);
 
+        if (this._isEdit) return null;
+
         return html`
             <div class="toolbar">
-                ${!this._isEdit && isEmpty
-                        ? html`
-                    <uui-button
-                        look="primary"
-                        label="Create table"
-                        ?disabled=${this.readonly}
-                        @click=${this._openCreateTableModal}>
-                        Create
-                    </uui-button>
-                `
-                        : html`
-                    <uui-button
-                        look="primary"
-                        label=${this._isEdit ? "Done" : "Edit"}
-                        ?disabled=${this.readonly}
-                        @click=${this._toggleEdit}>
-                        ${this._isEdit ? "Done" : "Edit"}
-                    </uui-button>
-                `
-                }
-
-                ${this._isEdit
-            ? html`
+                ${isEmpty
+                    ? html`
                         <uui-button
-                                look="secondary"
-                                @click=${this._cancel}
-                                .disabled=${this.readonly}
-                                label="Cancel"></uui-button>
+                            look="primary"
+                            label="Create table"
+                            ?disabled=${this.readonly}
+                            @click=${this._openCreateTableModal}>
+                            Create
+                        </uui-button>
                     `
-            : null}
+                    : html`
+                        <uui-button
+                            look="primary"
+                            label="Edit"
+                            ?disabled=${this.readonly}
+                            @click=${this._toggleEdit}>
+                            Edit
+                        </uui-button>
+                    `}
             </div>
         `;
     }
@@ -432,14 +437,29 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
     private _renderEditControls(_table: TableModel) {
         return html`
             <div class="editControls">
-                <div class="settings">
+                <uui-button
+                        look="secondary"
+                        compact
+                        @click=${this._openTableSettings}
+                        .disabled=${this.readonly}
+                        label="Table settings">
+                    <uui-icon name="icon-settings"></uui-icon>
+                </uui-button>
+
+                <div class="editActions">
                     <uui-button
                             look="secondary"
-                            compact
-                            @click=${this._openTableSettings}
+                            @click=${this._cancel}
                             .disabled=${this.readonly}
-                            label="Table settings">
-                        <uui-icon name="icon-settings"></uui-icon>
+                            label="Cancel">
+                        Cancel
+                    </uui-button>
+                    <uui-button
+                            look="primary"
+                            @click=${this._toggleEdit}
+                            .disabled=${this.readonly}
+                            label="Done">
+                        Done
                     </uui-button>
                 </div>
             </div>
@@ -448,49 +468,49 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
 
     private _renderReadTable(table: TableModel) {
         return html`
-            <uui-scroll-container>
-            <uui-table class="uuiReadTable">
-                <uui-table-row>
-                    ${table.columns.map(
-                            (c, ci) => {
-                                const isEmpty = !c.value?.trim();
-                                return html`
-                                <uui-table-head-cell class=${[
-                                    table.settings.columnHasHeader ? "colHeader" : "",
+            <uui-box class="tableBox">
+                <uui-scroll-container>
+                <uui-table class="uuiReadTable">
+                    <uui-table-row>
+                        ${table.columns.map(
+                                (c, ci) => {
+                                    const isEmpty = !c.value?.trim();
+                                    const classes = [
+                                        table.settings.columnHasHeader ? "colHeader" : "",
+                                        table.settings.rowHasHeader && ci === 0 ? "rowHeader" : "",
+                                        table.settings.highlightEmptyCells && isEmpty ? "empty" : "",
+                                    ].filter(Boolean).join(" ");
+                                    const display = c.value || (table.settings.highlightEmptyCells && isEmpty ? "—" : "");
+                                    return table.settings.columnHasHeader
+                                        ? html`<uui-table-head-cell class=${classes}>${display}</uui-table-head-cell>`
+                                        : html`<uui-table-cell class=${classes}>${display}</uui-table-cell>`;
+                                }
+                        )}
+                    </uui-table-row>
+
+                    ${table.rows.map(
+                            (r) => html`
+                            <uui-table-row>
+                                ${r.cells.map((cell, ci) => {
+                                const isEmpty = !cell.value?.trim();
+                                const isRowHeader = r.settings?.isHeaderRow;
+                                const isUnderlined = r.settings?.isUnderlined;
+                                const classes = [
                                     table.settings.rowHasHeader && ci === 0 ? "rowHeader" : "",
                                     table.settings.highlightEmptyCells && isEmpty ? "empty" : "",
-                                ].filter(Boolean).join(" ")}>
-                                    ${c.value}
-                                </uui-table-head-cell>
-                            `}
+                                ].filter(Boolean).join(" ");
+                                const display = cell.value || (table.settings.highlightEmptyCells && isEmpty ? "—" : "");
+                                const content = isUnderlined ? html`<span style="text-decoration:underline">${display}</span>` : display;
+                                return isRowHeader
+                                    ? html`<uui-table-head-cell class=${classes}>${content}</uui-table-head-cell>`
+                                    : html`<uui-table-cell class=${classes}>${content}</uui-table-cell>`;
+                            })}
+                            </uui-table-row>
+                        `
                     )}
-                </uui-table-row>
-
-                ${table.rows.map(
-                        (r) => html`
-                        <uui-table-row
-                                class=${[r.settings?.isHeaderRow ? "isHeaderRow" : "", r.settings?.isUnderlined ? "isUnderlined" : ""]
-                                .filter(Boolean)
-                                .join(" ")}>
-                            ${r.cells.map((cell, ci) => {
-                            const isEmpty = !cell.value?.trim();
-                            return html`
-                                    <uui-table-cell
-                                            class=${[
-                                table.settings.rowHasHeader && ci === 0 ? "rowHeader" : "",
-                                table.settings.highlightEmptyCells && isEmpty ? "empty" : "",
-                            ]
-                                    .filter(Boolean)
-                                    .join(" ")}>
-                                        ${cell.value}
-                                    </uui-table-cell>
-                                `;
-                        })}
-                        </uui-table-row>
-                    `
-                )}
-            </uui-table>
-            </uui-scroll-container>
+                </uui-table>
+                </uui-scroll-container>
+            </uui-box>
         `;
     }
 
@@ -499,16 +519,18 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         const templateCols = `repeat(${Math.max(colCount, 1)}, minmax(140px, 1fr))`;
 
         return html`
+            <uui-box class="tableBox">
             <uui-scroll-container>
-            <div class="gridEditor" style=${`--te-cols:${templateCols};`}
+            <div class=${["gridEditor", this._dragRowIndex !== null ? "draggingRow" : ""].filter(Boolean).join(" ")} style=${`--te-cols:${templateCols};`}
             data-drag-col="${this._dragOverColIndex ?? ''}">
                 ${this._renderColumnHoverCss(table.columns.length)}
                 <!-- Header -->
                 <div class="headerLayout">
-                    <div class="headerColumns">
+                    <div class="headerColumns"
+                        @dragover=${(e: DragEvent) => { if (this._isDraggingCol(e)) e.preventDefault(); }}>
                         ${table.columns.map((c, ci) => html`
-                            <div class=${["headerCol", this._dragOverColIndex === ci ? "dropTarget" : "", table.settings.rowHasHeader && ci === 0 ? "rowHeader" : ""].filter(Boolean).join(" ")}
-                                 style=${`grid-column:${ci + 1};`} 
+                            <div class=${["headerCol", table.settings.columnHasHeader ? "colHeaderActive" : "", this._dragOverColIndex === ci ? "dropTarget" : "", table.settings.rowHasHeader && ci === 0 ? "rowHeader" : "", table.settings.highlightEmptyCells && !c.value?.trim() ? "empty" : ""].filter(Boolean).join(" ")}
+                                 style=${`grid-column:${ci + 1};`}
                                  data-col="${ci}"
                                  @dragover=${(e: DragEvent) => this._onColDragOver(e, ci)}
                                  @drop=${(e: DragEvent) => this._onColDrop(e, ci)}>
@@ -538,16 +560,16 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                                                 @click=${(ev: Event) => { ev.stopPropagation(); this._insertCol(ci + 1); }}>
                                             <uui-icon name="icon-arrow-right"></uui-icon>
                                         </uui-button>
-                                        <span
-                                                class="dragHandle"
-                                                role="button"
-                                                aria-label="Drag to reorder column"
-                                                draggable=${this.readonly ? "false" : "true"}
-                                                @dragstart=${(e: DragEvent) => this._onColDragStart(e, ci)}
-                                                @dragend=${this._onColDragEnd}>
-                                            <uui-icon name="icon-navigation"></uui-icon>
-                                        </span>
                                     </uui-action-bar>
+                                    <span
+                                            class="dragHandle colDragHandle"
+                                            role="button"
+                                            aria-label="Drag to reorder column"
+                                            draggable=${this.readonly ? "false" : "true"}
+                                            @dragstart=${(e: DragEvent) => this._onColDragStart(e, ci)}
+                                            @dragend=${this._onColDragEnd}>
+                                        <uui-icon name="icon-navigation"></uui-icon>
+                                    </span>
                                 </div>
 
                                 <div class="colHead">
@@ -572,7 +594,7 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                 
                 ${table.rows.map(
                         (r, ri) => html`
-                            <div class=${["rowLayout", this._dragOverRowIndex === ri ? "dropTarget" : ""].filter(Boolean).join(" ")}
+                            <div class=${["rowLayout", this._dragOverRowIndex === ri ? "dropTarget" : "", r.settings?.isHeaderRow ? "isHeaderRow" : "", r.settings?.isUnderlined ? "isUnderlined" : ""].filter(Boolean).join(" ")}
                                  @dragover=${(e: DragEvent) => this._onRowDragOver(e, ri)}
                                  @drop=${(e: DragEvent) => this._onRowDrop(e, ri)} 
                                  data-row=${ri}>
@@ -602,9 +624,9 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                                 <div class="rowActionsRail">
                                     <uui-action-bar class="rowActions">
                                         <uui-button popovertarget="rowSettingsMenu${ri}"
-                                        look="secondary"
-                                        label="Row settings"
-                                        compact>
+                                                look="secondary"
+                                                label="Row settings"
+                                                compact>
                                             <uui-symbol-more></uui-symbol-more>
                                         </uui-button>
                                         <uui-popover-container id="rowSettingsMenu${ri}" placement="top-left" interaction="click">
@@ -618,7 +640,6 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                                                                     this._updateRowSettings(ri, { isHeaderRow: (e.target as any).checked })}>
                                                     </uui-toggle>
                                                 </div>
-
                                                 <div class="rowMenuItem">
                                                     <span>Underlined</span>
                                                     <uui-toggle
@@ -628,29 +649,17 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                                                                     this._updateRowSettings(ri, { isUnderlined: (e.target as any).checked })}>
                                                     </uui-toggle>
                                                 </div>
-
-                                                <div class="rowMenuDivider"></div>
-                                                <div class="rowMenuActions">
-                                                    <uui-button
-                                                            label="Delete row"
-                                                            look="primary"
-                                                            color="danger"
-                                                            ?disabled=${this.readonly || table.rows.length <= 1}
-                                                            popovertargetaction="hide"
-                                                            @click=${(ev: Event) => { ev.stopPropagation();this._closePopoverFromEvent(ev); this._removeRow(ri);}}>
-                                                        <uui-icon name="icon-trash"></uui-icon>
-                                                    </uui-button>
-                                                    <uui-button
-                                                            look="primary"
-                                                            @click=${(ev: Event) => {
-                                                                ev.stopPropagation();
-                                                                this._closePopoverFromEvent(ev);
-                                                            }}>
-                                                        Done
-                                                    </uui-button>
-                                                </div>
                                             </uui-box>
                                         </uui-popover-container>
+                                        <uui-button
+                                                label="Delete row"
+                                                look="secondary"
+                                                color="danger"
+                                                compact
+                                                ?disabled=${this.readonly || table.rows.length <= 1}
+                                                @click=${(ev: Event) => { ev.stopPropagation(); this._removeRow(ri); }}>
+                                            <uui-icon name="icon-trash"></uui-icon>
+                                        </uui-button>
                                         <span
                                                 class="dragHandle"
                                                 role="button"
@@ -674,6 +683,7 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
                 )}
             </div>
             </uui-scroll-container>
+            </uui-box>
         `;
     }
 
@@ -706,13 +716,23 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         .editControls {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-            margin: 10px 0;
+            justify-content: space-between;
+            gap: var(--uui-size-4);
+            margin-bottom: var(--uui-size-4);
+        }
+
+        .editActions {
+            display: flex;
+            gap: var(--uui-size-3);
         }
 
         uui-input {
             width: 100%;
+        }
+
+        .tableBox {
+            --uui-box-default-padding: 0;
+            overflow: hidden;
         }
 
         .uuiReadTable uui-table-head-cell,
@@ -797,16 +817,15 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         .rowHeader {
             font-weight: 700;
             background: var(--uui-color-surface-alt);
-            border-radius: 2px;
-            padding: 2px;
         }
 
-        .isHeaderRow {
+        .rowLayout.isHeaderRow .cell uui-input {
             font-weight: 700;
+            --uui-input-background-color: color-mix(in srgb, var(--uui-color-selected) 8%, transparent);
         }
 
-        .isUnderlined {
-            text-decoration: underline;
+        .rowLayout.isUnderlined .cell uui-input {
+            border-bottom: 2px solid var(--uui-color-text);
         }
 
         .empty uui-input {
@@ -815,10 +834,6 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
             outline-offset: 2px;
         }
 
-        uui-table-cell.empty,
-        uui-table-head-cell.empty {
-            background: color-mix(in srgb, var(--uui-color-warning) 12%, transparent);
-        }
         
         .insertLine {
             position: relative;
@@ -839,6 +854,10 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
         .insertLine:hover uui-button-inline-create,
         .insertLine:focus-within uui-button-inline-create {
             opacity: 1;
+        }
+
+        .draggingRow .insertLine uui-button-inline-create {
+            pointer-events: none;
         }
 
         .insertLine::before {
@@ -872,6 +891,10 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
             min-width: 0;
         }
 
+        .headerCol.colHeaderActive {
+            background: var(--uui-color-surface-alt);
+        }
+
         .colRailCell {
             display: flex;
             justify-content: center;
@@ -884,9 +907,23 @@ export class WebwondersTableEditorPropertyEditorUiElement extends UmbElementMixi
             pointer-events: none;
             transition: opacity 120ms ease-in-out;
         }
-        
+
+        .colDragHandle {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 120ms ease-in-out;
+        }
+
         .headerCol:hover .colRailActions,
-        .headerCol:focus-within .colRailActions {
+        .headerCol:focus-within .colRailActions,
+        .headerCol.rowHeader .colRailActions {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .headerCol:hover .colDragHandle,
+        .headerCol:focus-within .colDragHandle,
+        .headerCol.rowHeader .colDragHandle {
             opacity: 1;
             pointer-events: auto;
         }
